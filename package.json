@@ -1,0 +1,21 @@
+{
+    "name": "zenvy-ai-video",
+    "version": "1.0.0",
+    "scripts": {
+      "dev": "next dev",
+      "build": "prisma generate && next build",
+      "start": "next start",
+      "db:push": "prisma db push",
+      "studio": "prisma studio"
+    },
+    "dependencies": {
+      "@prisma/client": "latest",
+      "bcryptjs": "latest",
+      "jose": "latest",
+      "next": "latest",
+      "prisma": "latest",
+      "react": "latest",
+      "react-dom": "latest"
+    },
+    "devDependencies": {}
+  }
