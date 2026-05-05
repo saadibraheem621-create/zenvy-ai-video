@@ -8,9 +8,10 @@
   },
 
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+  "dev": "next dev",
+  "build": "npx prisma generate && next build",
+  "start": "next start"
+},
     "dbpush": "prisma db push",
     "studio": "prisma studio"
   },
