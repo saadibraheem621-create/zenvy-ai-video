@@ -4,16 +4,13 @@
   "private": true,
 
   "engines": {
-    "node": "20.19.0"
+    "node": "20.x"
   },
 
   "scripts": {
-  "dev": "next dev",
-  "build": "npx prisma generate && next build",
-  "start": "next start"
-},
-    "dbpush": "prisma db push",
-    "studio": "prisma studio"
+    "dev": "next dev",
+    "build": "npx prisma generate && next build",
+    "start": "next start"
   },
 
   "prisma": {
@@ -23,10 +20,10 @@
   "dependencies": {
     "@prisma/client": "5.22.0",
     "prisma": "5.22.0",
-    "bcryptjs": "latest",
-    "jose": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "bcryptjs": "latest",
+    "jose": "latest"
   }
 }
