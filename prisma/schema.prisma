@@ -1,0 +1,38 @@
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  credits   Int      @default(0)
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  payments  Payment[]
+  videos    Video[]
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  userId    String
+  method    String
+  amount    Int
+  credits   Int
+  proof     String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Video {
+  id        String   @id @default(cuid())
+  userId    String
+  prompt    String
+  duration  Int
+  cost      Int
+  status    String   @default("pending")
+  videoUrl  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
