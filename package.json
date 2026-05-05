@@ -6,8 +6,9 @@
     "schema": "prisma/schema.prisma"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "prisma generate --schema=prisma/schema.prisma && next build",
+  "build": "npx prisma generate --schema=./prisma/schema.prisma && next build"
+  },
+
 "start": "next start",
     "dbpush": "prisma db push",
     "studio": "prisma studio"
