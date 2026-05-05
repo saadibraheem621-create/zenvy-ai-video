@@ -2,9 +2,10 @@
   "name": "zenvy-ai-video",
   "version": "1.0.0",
   "private": true,
+
   "engines": {
-  "node": "20.x"
-},
+    "node": "20.x"
+  },
 
   "scripts": {
     "dev": "next dev",
@@ -19,11 +20,11 @@
   },
 
   "dependencies": {
-    "@prisma/client": "latest",
+    "@prisma/client": "5.22.0",
+    "prisma": "5.22.0",
     "bcryptjs": "latest",
     "jose": "latest",
     "next": "latest",
-    "prisma": "latest",
     "react": "latest",
     "react-dom": "latest"
   }
