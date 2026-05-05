@@ -28,16 +28,20 @@ export default function Login() {
   }
 
   return (
-    <div className="card">
-      <h2>تسجيل الدخول</h2>
+    <div className="relative">
+  <input
+    type={show ? "text" : "password"}
+    placeholder="كلمة المرور"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    className="p-3 w-full border rounded-lg"
+  />
 
-      <form onSubmit={submit}>
-        <input name="email" type="email" placeholder="البريد" required />
-        <input name="password" type="password" placeholder="كلمة المرور" required />
-        <button>دخول</button>
-      </form>
-
-      <p>{msg}</p>
-    </div>
-  );
-}
+  <button
+    type="button"
+    onClick={() => setShow(!show)}
+    className="absolute right-3 top-3 text-xl"
+  >
+    {show ? "🙈" : "👁️"}
+  </button>
+</div>
