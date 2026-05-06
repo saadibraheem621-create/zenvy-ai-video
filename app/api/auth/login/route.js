@@ -1,35 +1,60 @@
-import { prisma } from "@/lib/db";
-import { createToken } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { prisma } from "../../../../lib/db";
 
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
 
-    const user = await prisma.user.findUnique({ where: { email } });
+    const { email, password } = body;
 
-    if (!user) {
-      return Response.json({ success: false, error: "الحساب غير موجود" });
+    if (!email || !password) {
+      return NextResponse.json({
+        success: false,
+        error: "املأ جميع الحقول",
+      });
     }
 
-    const ok = await bcrypt.compare(password, user.password);
-
-    if (!ok) {
-      return Response.json({ success: false, error: "كلمة المرور خطأ" });
-    }
-
-    const token = await createToken(user);
-
-    const cookieStore = await cookies();
-    cookieStore.set("token", token, {
-      httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7
+    const user = await prisma.user.findUnique({
+      where: { email },
     });
 
-    return Response.json({ success: true });
-  } catch {
-    return Response.json({ success: false, error: "فشل تسجيل الدخول" });
+    if (!user) {
+      return NextResponse.json({
+        success: false,
+        error: "البريد الإلكتروني غير موجود",
+      });
+    }
+
+    const validPassword = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!validPassword) {
+      return NextResponse.json({
+        success: false,
+        error: "كلمة المرور غير صحيحة",
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        credits: user.credits,
+        isAdmin: user.isAdmin,
+      },
+    });
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+
+    return NextResponse.json({
+      success: false,
+      error: "خطأ بالسيرفر",
+    });
   }
 }

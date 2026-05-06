@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db";
-import { getUserFromCookie } from "@/lib/auth";
+import { prisma } from "../../../../../lib/db";
+import { getUserFromCookie } from "../../../../../lib/auth";
 
 export async function POST(req) {
   const session = await getUserFromCookie();

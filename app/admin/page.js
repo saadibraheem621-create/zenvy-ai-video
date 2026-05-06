@@ -1,6 +1,6 @@
 "use client";
 
-export { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AdminPage() {
   const [payments, setPayments] = useState([]);

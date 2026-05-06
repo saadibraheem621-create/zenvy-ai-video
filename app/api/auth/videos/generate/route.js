@@ -1,60 +1,43 @@
-import { prisma } from "@/lib/db";
-import { getUserFromCookie } from "@/lib/auth";
-
-function getCost(duration) {
-  if (duration === 10) return 35;
-  return 20;
-}
+import { NextResponse } from "next/server";
+import Replicate from "replicate";
 
 export async function POST(req) {
-  const session = await getUserFromCookie();
+  try {
+    const { prompt } = await req.json();
 
-  if (!session) {
-    return Response.json({ success: false, error: "سجل دخول أولاً" });
-  }
+    if (!prompt) {
+      return NextResponse.json({
+        success: false,
+        error: "اكتب وصف الفيديو",
+      });
+    }
 
-  const { prompt, style, duration } = await req.json();
+    const replicate = new Replicate({
+      auth: process.env.REPLICATE_API_TOKEN,
+    });
 
-  const cost = getCost(duration);
+    const output = await replicate.run(
+      "kwaivgi/kling-v1.6-standard",
+      {
+        input: {
+          prompt,
+          duration: 5,
+          aspect_ratio: "16:9",
+        },
+      }
+    );
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.id }
-  });
+    return NextResponse.json({
+      success: true,
+      videoUrl: Array.isArray(output) ? output[0] : output,
+    });
+  } catch (error) {
+    console.error("VIDEO GENERATION ERROR:", error);
 
-  if (!user || user.credits < cost) {
-    return Response.json({
+    return NextResponse.json({
       success: false,
-      error: "رصيد Credits غير كافي"
+      error: "فشل توليد الفيديو الحقيقي",
+      details: error.message,
     });
   }
-
-  // حالياً فيديو تجريبي Mock
-  // لاحقاً نربطه بـ Replicate / Runway / fal.ai
-  const mockVideoUrl =
-    "https://samplelib.com/lib/preview/mp4/sample-5s.mp4";
-
-  await prisma.user.update({
-    where: { id: session.id },
-    data: {
-      credits: {
-        decrement: cost
-      }
-    }
-  });
-
-  const video = await prisma.video.create({
-    data: {
-      userId: session.id,
-      prompt,
-      style,
-      duration,
-      cost,
-      videoUrl: mockVideoUrl
-    }
-  });
-
-  return Response.json({
-    success: true,
-    video
-  });
 }

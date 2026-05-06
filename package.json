@@ -2,28 +2,25 @@
   "name": "zenvy-ai-video",
   "version": "1.0.0",
   "private": true,
-
   "engines": {
     "node": "20.x"
   },
-
   "scripts": {
     "dev": "next dev",
     "build": "npx prisma generate && next build",
     "start": "next start"
   },
-
   "prisma": {
     "schema": "prisma/schema.prisma"
   },
-
   "dependencies": {
     "@prisma/client": "5.22.0",
-    "prisma": "5.22.0",
+    "bcryptjs": "latest",
+    "jose": "latest",
     "next": "latest",
+    "prisma": "5.22.0",
     "react": "latest",
     "react-dom": "latest",
-    "bcryptjs": "latest",
-    "jose": "latest"
+    "replicate": "^1.4.0"
   }
 }

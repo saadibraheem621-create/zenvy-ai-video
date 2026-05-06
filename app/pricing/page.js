@@ -1,69 +1,96 @@
 "use client";
 
-import { useState } from "react";
+const plans = [
+  {
+    name: "Starter",
+    price: "$10",
+    credits: 100,
+  },
+  {
+    name: "Pro",
+    price: "$35",
+    credits: 500,
+  },
+  {
+    name: "Ultra",
+    price: "$99",
+    credits: 2000,
+  },
+];
 
-export default function Pricing() {
-  const [msg, setMsg] = useState("");
-
-  async function buy(method, amount, credits) {
-    const proof = prompt("اكتب رقم العملية أو رابط صورة الوصل:");
-
-    const res = await fetch("/api/payments/create", {
-      method: "POST",
-      body: JSON.stringify({
-        method,
-        amount,
-        credits,
-        proof
-      })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      setMsg("تم إرسال طلب الدفع. انتظر موافقة الإدارة.");
-    } else {
-      setMsg(data.error);
-    }
-  }
-
+export default function PricingPage() {
   return (
-    <div>
-      <h1 className="hero">باقات Credits</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#020617",
+        color: "white",
+        padding: "40px",
+      }}
+    >
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "40px",
+          fontSize: "40px",
+        }}
+      >
+        Pricing Plans
+      </h1>
 
-      <div className="grid">
-        <div className="card">
-          <h2>Starter</h2>
-          <p>100 Credits</p>
-          <h3>$10</h3>
-          <button onClick={() => buy("USDT", 10, 100)}>دفع USDT</button>
-          <br /><br />
-          <button onClick={() => buy("ZAINCASH", 10, 100)}>دفع ZainCash</button>
-        </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit,minmax(280px,1fr))",
+          gap: "20px",
+          maxWidth: "1100px",
+          margin: "auto",
+        }}
+      >
+        {plans.map((plan) => (
+          <div
+            key={plan.name}
+            style={{
+              background: "#111827",
+              borderRadius: "20px",
+              padding: "30px",
+              border: "1px solid #1e293b",
+            }}
+          >
+            <h2>{plan.name}</h2>
 
-        <div className="card">
-          <h2>Pro</h2>
-          <p>300 Credits</p>
-          <h3>$25</h3>
-          <button onClick={() => buy("USDT", 25, 300)}>دفع USDT</button>
-          <br /><br />
-          <button onClick={() => buy("ZAINCASH", 25, 300)}>دفع ZainCash</button>
-        </div>
+            <h1
+              style={{
+                fontSize: "50px",
+              }}
+            >
+              {plan.price}
+            </h1>
 
-        <div className="card">
-          <h2>Business</h2>
-          <p>800 Credits</p>
-          <h3>$60</h3>
-          <button onClick={() => buy("USDT", 60, 800)}>دفع USDT</button>
-          <br /><br />
-          <button onClick={() => buy("ZAINCASH", 60, 800)}>دفع ZainCash</button>
-        </div>
-      </div>
+            <p>Credits {plan.credits}</p>
 
-      <div className="card">
-        <p>{msg}</p>
-        <p className="small">USDT TRC20: ضع محفظتك داخل .env</p>
-        <p className="small">ZainCash: ضع رقمك داخل .env</p>
+            <button
+              onClick={() => {
+                window.location.href =
+                  `/payments/create?credits=${plan.credits}&amount=${plan.price}`;
+              }}
+              style={{
+                width: "100%",
+                marginTop: "20px",
+                padding: "15px",
+                border: "none",
+                borderRadius: "12px",
+                background: "#06b6d4",
+                color: "white",
+                cursor: "pointer",
+                fontSize: "16px",
+              }}
+            >
+              Buy Now
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

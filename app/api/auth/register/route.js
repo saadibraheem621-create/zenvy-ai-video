@@ -1,42 +1,49 @@
-import { prisma } from "@/lib/db";
-import { createToken } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { cookies } from "next/headers";
+import { prisma } from "../../../../lib/db";
 
 export async function POST(req) {
   try {
     const { name, email, password } = await req.json();
 
-    const exists = await prisma.user.findUnique({ where: { email } });
-
-    if (exists) {
-      return Response.json({ success: false, error: "البريد مستخدم مسبقاً" });
+    if (!name || !email || !password) {
+      return NextResponse.json({
+        success: false,
+        error: "املأ كل الحقول"
+      });
     }
 
-    const hashed = await bcrypt.hash(password, 10);
+    const exists = await prisma.user.findUnique({
+      where: { email }
+    });
 
-    const isAdmin = email === process.env.ADMIN_EMAIL;
+    if (exists) {
+      return NextResponse.json({
+        success: false,
+        error: "هذا البريد مسجل مسبقاً"
+      });
+    }
 
-    const user = await prisma.user.create({
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.create({
       data: {
         name,
         email,
-        password: hashed,
-        isAdmin
+        password: hashedPassword,
+        
       }
     });
 
-    const token = await createToken(user);
-
-    const cookieStore = await cookies();
-    cookieStore.set("token", token, {
-      httpOnly: true,
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7
+    return NextResponse.json({
+      success: true
     });
+  } catch (error) {
+    console.error("REGISTER ERROR:", error);
 
-    return Response.json({ success: true });
-  } catch (e) {
-    return Response.json({ success: false, error: "حدث خطأ بالتسجيل" });
+    return NextResponse.json({
+      success: false,
+      error: error.message
+    });
   }
 }

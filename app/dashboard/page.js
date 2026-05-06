@@ -1,47 +1,108 @@
-import { prisma } from "@/lib/db";
-import { getUserFromCookie } from "@/lib/auth";
+import { prisma } from "../../lib/db";
 
 export default async function Dashboard() {
-  const session = await getUserFromCookie();
-
-  if (!session) {
-    return <div className="card">يرجى تسجيل الدخول أولاً</div>;
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.id },
-    include: {
-      videos: {
-        orderBy: { createdAt: "desc" }
-      },
-      payments: {
-        orderBy: { createdAt: "desc" }
-      }
-    }
+  const users = await prisma.user.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   return (
-    <div className="card">
-      <h2>لوحة المستخدم</h2>
-      <p>مرحباً: {user.name}</p>
-      <h3>رصيدك: {user.credits} Credits</h3>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#020617",
+        color: "white",
+        padding: "40px",
+        fontFamily: "sans-serif",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "auto",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "38px",
+            marginBottom: "10px",
+          }}
+        >
+          Zenvy AI Dashboard
+        </h1>
 
-      <a href="/generate">
-        <button>توليد فيديو جديد</button>
-      </a>
+        <p
+          style={{
+            color: "#94a3b8",
+            marginBottom: "30px",
+          }}
+        >
+          منصة الذكاء الاصطناعي الخاصة بك
+        </p>
 
-      <a href="/pricing">
-        <button>شراء Credits</button>
-      </a>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+            gap: "20px",
+            marginBottom: "30px",
+          }}
+        >
+          <div style={cardStyle}>
+            <h2>👥 المستخدمين</h2>
+            <h1>{users.length}</h1>
+          </div>
 
-      <h3>آخر الفيديوهات</h3>
+          <div style={cardStyle}>
+            <h2>🎬 الفيديوهات</h2>
+            <h1>0</h1>
+          </div>
 
-      {user.videos.map((v) => (
-        <div key={v.id} className="video-box">
-          <p>{v.prompt}</p>
-          <a href={v.videoUrl} target="_blank">فتح الفيديو</a>
+          <div style={cardStyle}>
+            <h2>💳 الأرباح</h2>
+            <h1>$0</h1>
+          </div>
         </div>
-      ))}
+
+        <div
+          style={{
+            background: "#111827",
+            borderRadius: "20px",
+            padding: "25px",
+            border: "1px solid #1e293b",
+          }}
+        >
+          <h2 style={{ marginBottom: "20px" }}>
+            المستخدمين المسجلين
+          </h2>
+
+          {users.map((user) => (
+            <div
+              key={user.id}
+              style={{
+                padding: "15px",
+                borderBottom: "1px solid #1e293b",
+              }}
+            >
+              <h3>{user.name}</h3>
+
+              <p style={{ color: "#94a3b8" }}>
+                {user.email}
+              </p>
+
+              <p>Credits: {user.credits}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
+
+const cardStyle = {
+  background: "#111827",
+  padding: "25px",
+  borderRadius: "20px",
+  border: "1px solid #1e293b",
+};

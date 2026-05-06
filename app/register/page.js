@@ -2,44 +2,144 @@
 
 import { useState } from "react";
 
-export default function Register() {
-  const [msg, setMsg] = useState("");
+export default function RegisterPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function submit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
-    const form = new FormData(e.target);
+    setLoading(true);
 
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name: form.get("name"),
-        email: form.get("email"),
-        password: form.get("password")
-      })
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
 
-    const data = await res.json();
+      const text = await res.text();
 
-    if (data.success) {
-      location.href = "/dashboard";
-    } else {
-      setMsg(data.error);
+      console.log("SERVER RESPONSE:", text);
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        alert("السيرفر رجّع صفحة خطأ، شوف Terminal");
+        setLoading(false);
+        return;
+      }
+
+      if (data.success) {
+        alert("تم إنشاء الحساب بنجاح");
+        window.location.href = "/login";
+      } else {
+        alert(data.error || "حدث خطأ");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("فشل الاتصال بالسيرفر");
     }
+
+    setLoading(false);
   }
 
   return (
-    <div className="card">
-      <h2>إنشاء حساب</h2>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          width: "400px",
+          background: "#1e293b",
+          padding: "30px",
+          borderRadius: "15px",
+          color: "white",
+          boxShadow: "0 0 20px rgba(0,0,0,0.4)",
+        }}
+      >
+        <h1
+          style={{
+            textAlign: "center",
+            marginBottom: "25px",
+          }}
+        >
+          إنشاء حساب
+        </h1>
 
-      <form onSubmit={submit}>
-        <input name="name" placeholder="الاسم" required />
-        <input name="email" type="email" placeholder="البريد" required />
-        <input name="password" type="password" placeholder="كلمة المرور" required />
-        <button>تسجيل</button>
+        <input
+          type="text"
+          placeholder="الاسم"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          style={inputStyle}
+        />
+
+        <input
+          type="email"
+          placeholder="البريد الإلكتروني"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          style={inputStyle}
+        />
+
+        <input
+          type="password"
+          placeholder="كلمة المرور"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={inputStyle}
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "14px",
+            border: "none",
+            borderRadius: "10px",
+            background: "#06b6d4",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+        >
+          {loading ? "جاري التسجيل..." : "تسجيل"}
+        </button>
       </form>
-
-      <p>{msg}</p>
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  padding: "14px",
+  marginBottom: "15px",
+  borderRadius: "10px",
+  border: "1px solid #334155",
+  background: "#0f172a",
+  color: "white",
+  outline: "none",
+};
